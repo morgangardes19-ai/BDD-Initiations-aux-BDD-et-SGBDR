@@ -19,3 +19,17 @@ WHERE departement.departement_code = "01"
 ```
 
 ## Etape 1 :
+```sql
+ SELECT * 
+ FROM villes_france_free 
+ ORDER BY ville_population_2012 DESC
+LIMIT 10
+```
+
+## Etape 2 :
+```sql
+ SELECT * 
+ FROM villes_france_free 
+ ORDER BY ville_surface ASC
+LIMIT 50
+```
