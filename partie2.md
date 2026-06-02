@@ -7,7 +7,9 @@ WHERE prenom = 'Muriel' AND password = SHA1('test11');
 
 ### ETAPE 2 : Obtenir la liste de tous les produits qui sont présent sur plusieurs commandes.
 ```sql
-
+SELECT commande_ligne.nom
+FROM commande_ligne
+JOIN 
 ```
 
 
