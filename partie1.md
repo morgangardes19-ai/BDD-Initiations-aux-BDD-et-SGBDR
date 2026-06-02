@@ -53,9 +53,63 @@ LIMIT 10
 
 ## Etape 5 : à compléter ?
 ```sql
- SELECT departement_nom, departement_code
+ SELECT departement.departement_nom, departement.departement_code,
+ COUNT(villes_france_free.ville_commune) AS nombre_commune
  FROM departement
- JOIN villes_france_free ON villes_france_free.ville_commune
- 
- 
+ JOIN villes_france_free ON villes_france_free.ville_departement = departement.departement_code
+ GROUP BY departement.departement_nom
+ ORDER BY nombre_commune DESC
+```
+
+## Etape 6 : 
+```sql
+ SELECT departement.departement_nom, departement.departement_code, 
+SUM(villes_france_free.ville_surface) AS departement_superficie
+ FROM departement
+ JOIN villes_france_free ON villes_france_free.ville_departement = departement.departement_code
+GROUP BY departement.departement_nom
+ORDER BY departement_superficie DESC
+LIMIT 10
+```
+
+## Etape 7 : 
+```sql
+ SELECT COUNT(villes_france_free.ville_nom) AS nb_ville_commencent_par_Saint
+ FROM villes_france_free
+ WHERE villes_france_free.ville_nom LIKE 'SAINT%';
+```
+
+
+## Etape 8 : 
+```sql
+ SELECT villes_france_free.ville_nom,
+ COUNT(villes_france_free.ville_nom) AS nombre_ville_nom
+ FROM villes_france_free
+GROUP BY villes_france_free.ville_nom
+ORDER BY nombre_ville_nom DESC
+```
+
+
+## Etape 9 : 
+```sql
+SELECT *
+FROM villes_france_free
+WHERE ville_surface > (SELECT AVG(ville_surface) FROM villes_france_free)
+```
+
+## Etape 10 : 
+```sql
+SELECT departement.departement_nom,
+SUM(villes_france_free.ville_population_2012) AS population_2012
+FROM departement
+JOIN villes_france_free ON villes_france_free.ville_departement = departement.departement_code
+GROUP BY departement.departement_nom
+HAVING population_2012 > 2000000
+```
+
+## Etape 11 : 
+```sql
+UPDATE villes_france_free
+SET villes_france_free.ville_nom = REPLACE(villes_france_free.ville_nom, 'SAINT-', 'SAINT ') 
+WHERE villes_france_free.ville_nom LIKE 'SAINT-%';
 ```
