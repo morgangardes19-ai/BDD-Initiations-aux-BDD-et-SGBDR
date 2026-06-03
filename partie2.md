@@ -25,13 +25,13 @@ HAVING nb_produits > 1
 ```
 
 
-### ETAPE 4 : Enregistrer le prix total à l’intérieur de chaque ligne des commandes, en fonction du prix unitaire et de la quantité.
+<!-- ### ETAPE 4 : Enregistrer le prix total à l’intérieur de chaque ligne des commandes, en fonction du prix unitaire et de la quantité.
 ```sql
 UPDATE commande_ligne
 SET commande_ligne.prix_total = commande_ligne.quantite * commande_ligne.prix_unitaire
 
 "WHERE ====> Est-ce qu'il faut un WHERE ... = (*)? ==> on fait un GROUP BY obligatirement ?"
-```
+``` -->
 
 
 ### ETAPE 5 : Obtenir le montant total pour chaque commande et y voir facilement la date associée à cette commande ainsi que le prénom et nom du client associé.
@@ -43,7 +43,7 @@ JOIN commande_ligne ON commande_ligne.id = commande.id
 ```
 
 
-### ETAPE 6 : (difficulté très haute) Enregistrer le montant total de chaque commande dans le champ intitulé “cache_prix_total”.
+<!-- ### ETAPE 6 : (difficulté très haute) Enregistrer le montant total de chaque commande dans le champ intitulé “cache_prix_total”.
 ```sql
 SELECT SUM(commande_ligne.prix_total) AS somme_prix_totaux
 FROM commande_ligne
@@ -58,4 +58,77 @@ SET commande.cache_prix_total = somme_prix_totaux
 "WHERE commande.cache_prix_total"
 
 "WHERE commande_ligne.commande_id = * ===> remplacé par le GROUP BY ci-dessus ?"
+``` -->
+
+
+<!-- ### ETAPE 7 : Obtenir le montant global de toutes les commandes, pour chaque mois.
+```sql
+SELECT SUM(commande_ligne.prix_total) AS somme_prix_mois, DATE_FORMAT(2019-01-01, "%d/%m/%Y")
+FROM commande_ligne
+JOIN commande ON commande.id = commande_ligne.commande_id
+GROUP BY commande.date_achat
+``` -->
+
+
+<!-- ### ETAPE 8 : Obtenir la liste des 10 clients qui ont effectué le plus grand montant de commandes, et obtenir ce montant total pour chaque client.
+```sql
+SELECT client.prenom, client.nom, 
+
+liste montant DESC puis associer une colonne prénom/nom
+LIMIT 10
+``` -->
+
+
+### ETAPE 9 : Obtenir le montant total des commandes pour chaque date>.
+```sql
+SELECT SUM(commande_ligne.prix_total) AS somme_prix_date, commande.date_achat
+FROM commande_ligne
+JOIN commande ON commande.id = commande_ligne.commande_id
+GROUP BY commande.date_achat
+```
+
+
+### ETAPE 10 : Ajouter une colonne intitulée “category” à la table contenant les commandes. Cette colonne contiendra une valeur numérique.
+```sql
+ALTER TABLE commande
+ADD category int
+```
+
+
+<!-- ### ETAPE 11 : Enregistrer la valeur de la catégorie, en suivant les règles suivantes :
+* “1” pour les commandes de moins de 200€
+* “2” pour les commandes entre 200€ et 500€
+* “3” pour les commandes entre 500€ et 1.000€
+* “4” pour les commandes supérieures à 1.000€
+```sql
+ INSERT INTO commande (category) VALUES (1, 2, 3, 4);
+ SELECT SUM(commande_ligne.prix_total) AS somme_prix_date
+ FROM commande_ligne
+ JOIN commande ON commande.id = commande_ligne.commande_id
+ GROUP BY commande_ligne.commande_id
+ HAVING SUM(commande_ligne.prix_total) <200, SUM(commande_ligne.prix_total) >= 200 && <= 500,  SUM(commande_ligne.prix_total) >= 500 && <= 1000,  SUM(commande_ligne.prix_total) > 1000
+``` -->
+
+
+### ETAPE 12 : Créer une table intitulée “commande_category” qui contiendra le descriptif de ces catégories.
+```sql
+ALTER TABLE commande_category
+ADD descriptif VARCHAR (255)
+```
+
+
+### ETAPE 13 : Insérer les 4 descriptifs de chaque catégorie au sein de la table précédemment créée.
+```sql
+INSERT INTO table (colonne1, colonne2) VALUES (valeur1, valeur2);
+
+INSERT INTO commande_category (Indice, fourchette_prix)
+ VALUES (1, < 200 €)
+ "N'affiche pas de prix dnas fourchete_prix"
+```
+
+
+### ETAPE 14 : Supprimer toutes les commandes (et les lignes des commandes) inférieur au 1er février 2019. Cela doit être effectué en 2 requêtes maximum.
+```sql
+ DELETE FROM table WHERE condition;
+exemple : DELETE FROM users WHERE age < 18;
 ```
