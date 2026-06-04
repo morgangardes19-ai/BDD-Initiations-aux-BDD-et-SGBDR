@@ -25,40 +25,32 @@ HAVING nb_produits > 1
 ```
 
 
-<!-- ### ETAPE 4 : Enregistrer le prix total à l’intérieur de chaque ligne des commandes, en fonction du prix unitaire et de la quantité.
+### ETAPE 4 : Enregistrer le prix total à l’intérieur de chaque ligne des commandes, en fonction du prix unitaire et de la quantité.
 ```sql
 UPDATE commande_ligne
 SET commande_ligne.prix_total = commande_ligne.quantite * commande_ligne.prix_unitaire
-
-"WHERE ====> Est-ce qu'il faut un WHERE ... = (*)? ==> on fait un GROUP BY obligatirement ?"
-``` -->
+```
 
 
 ### ETAPE 5 : Obtenir le montant total pour chaque commande et y voir facilement la date associée à cette commande ainsi que le prénom et nom du client associé.
 ```sql
-SELECT client.prenom, client.nom, commande.date_achat, commande_ligne.prix_total
-FROM client
-JOIN commande ON commande.id = client.id
-JOIN commande_ligne ON commande_ligne.id = commande.id
+SELECT client.prenom, client.nom, commande.date_achat, SUM(commande_ligne.prix_total) AS somme
+FROM commande_ligne
+LEFT JOIN commande ON commande.id = commande_ligne.commande_id
+LEFT JOIN client ON client.id = commande.client_id
+GROUP BY commande_ligne.commande_id;
 ```
 
 
-<!-- ### ETAPE 6 : (difficulté très haute) Enregistrer le montant total de chaque commande dans le champ intitulé “cache_prix_total”.
+### ETAPE 6 : (difficulté très haute) Enregistrer le montant total de chaque commande dans le champ intitulé “cache_prix_total”.
 ```sql
-SELECT SUM(commande_ligne.prix_total) AS somme_prix_totaux
-FROM commande_ligne
-JOIN commande ON commande.id = commande_ligne.commande_id
-GROUP BY commande_ligne.commande_id;
 UPDATE commande
--------
-FROM commande_ligne
-INNER JOIN commande ON commande.id = commande_ligne.commande_id
--------
-SET commande.cache_prix_total = somme_prix_totaux
-"WHERE commande.cache_prix_total"
-
-"WHERE commande_ligne.commande_id = * ===> remplacé par le GROUP BY ci-dessus ?"
-``` -->
+JOIN (SELECT commande_ligne.commande_id, SUM(commande_ligne.prix_total) AS prix_commande
+     FROM commande_ligne
+     GROUP BY commande_ligne.commande_id) T2
+     ON commande.id = T2.commande_id
+SET commande.cache_prix_total = T2.prix_commande
+```
 
 
 <!-- ### ETAPE 7 : Obtenir le montant global de toutes les commandes, pour chaque mois.
@@ -123,12 +115,12 @@ INSERT INTO table (colonne1, colonne2) VALUES (valeur1, valeur2);
 
 INSERT INTO commande_category (Indice, fourchette_prix)
  VALUES (1, < 200 €)
- "N'affiche pas de prix dnas fourchete_prix"
+ "N'affiche pas de prix dans fourchete_prix"
 ```
 
 
 ### ETAPE 14 : Supprimer toutes les commandes (et les lignes des commandes) inférieur au 1er février 2019. Cela doit être effectué en 2 requêtes maximum.
 ```sql
- DELETE FROM table WHERE condition;
-exemple : DELETE FROM users WHERE age < 18;
+DELETE FROM commande
+WHERE commande.date_achat < 2019-02-01
 ```
