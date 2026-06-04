@@ -53,22 +53,25 @@ SET commande.cache_prix_total = T2.prix_commande
 ```
 
 
-<!-- ### ETAPE 7 : Obtenir le montant global de toutes les commandes, pour chaque mois.
+### ETAPE 7 : Obtenir le montant global de toutes les commandes, pour chaque mois.
 ```sql
-SELECT SUM(commande_ligne.prix_total) AS somme_prix_mois, DATE_FORMAT(2019-01-01, "%d/%m/%Y")
+SELECT SUM(commande_ligne.prix_total) AS somme_prix_mois, MONTH(commande.date_achat) AS date_mois
 FROM commande_ligne
 JOIN commande ON commande.id = commande_ligne.commande_id
-GROUP BY commande.date_achat
-``` -->
+GROUP BY MONTH(commande.date_achat)
+```
 
 
-<!-- ### ETAPE 8 : Obtenir la liste des 10 clients qui ont effectué le plus grand montant de commandes, et obtenir ce montant total pour chaque client.
+### ETAPE 8 : Obtenir la liste des 10 clients qui ont effectué le plus grand montant de commandes, et obtenir ce montant total pour chaque client.
 ```sql
-SELECT client.prenom, client.nom, 
-
-liste montant DESC puis associer une colonne prénom/nom
+SELECT client.prenom, client.nom, SUM(commande_ligne.prix_total) AS montant_commande
+FROM commande_ligne
+JOIN commande ON commande.id = commande_ligne.commande_id
+JOIN client ON client.id = commande.id
+GROUP BY commande_ligne.prix_total
+ORDER BY montant_commande DESC
 LIMIT 10
-``` -->
+```
 
 
 ### ETAPE 9 : Obtenir le montant total des commandes pour chaque date>.
@@ -87,7 +90,7 @@ ADD category int
 ```
 
 
-<!-- ### ETAPE 11 : Enregistrer la valeur de la catégorie, en suivant les règles suivantes :
+### ETAPE 11 : Enregistrer la valeur de la catégorie, en suivant les règles suivantes :
 * “1” pour les commandes de moins de 200€
 * “2” pour les commandes entre 200€ et 500€
 * “3” pour les commandes entre 500€ et 1.000€
@@ -99,7 +102,7 @@ ADD category int
  JOIN commande ON commande.id = commande_ligne.commande_id
  GROUP BY commande_ligne.commande_id
  HAVING SUM(commande_ligne.prix_total) <200, SUM(commande_ligne.prix_total) >= 200 && <= 500,  SUM(commande_ligne.prix_total) >= 500 && <= 1000,  SUM(commande_ligne.prix_total) > 1000
-``` -->
+```
 
 
 ### ETAPE 12 : Créer une table intitulée “commande_category” qui contiendra le descriptif de ces catégories.
